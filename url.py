@@ -3,8 +3,6 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from cryptography.fernet import Fernet
 import json
-import smtplib
-from email.mime.text import MIMEText
 import os
 from uuid import uuid4
 import config  # Importamos la configuración desde config.py
@@ -27,12 +25,12 @@ class Message(BaseModel):
 async def mostrar_formulario(request: Request):
     return templates.TemplateResponse(plantillas.INDEX, {"request": request})
 
-# Endpoint para enviar y almacenar el mensaje
+
+## Endpoint para guardar el mensaje
 @router.post("/guardar/", response_class=HTMLResponse)
-async def guardar_mensaje(request: Request, mensaje: str = Form(...), email: str = Form(...)):
+async def guardar_mensaje(request: Request, mensaje: str = Form(...)):
     try:
         mensaje_encriptado = encriptar(mensaje, config.SECRET_KEY)
-        email_destino = email
 
         unique_id = str(uuid4())
         file_name = f"{unique_id}.json"
@@ -40,44 +38,37 @@ async def guardar_mensaje(request: Request, mensaje: str = Form(...), email: str
         with open(file_name, "w") as f:
             json.dump({"mensaje": mensaje_encriptado.decode()}, f)
 
-        url = f"{config.BASE_URL}/leer-mensaje/{file_name}"
-
-        msg = MIMEText(f"Puedes leer tu mensaje en: {url}")
-        msg["Subject"] = "Tu mensaje"
-        msg["From"] = config.FROM_EMAIL
-        msg["To"] = email_destino
-
-        with smtplib.SMTP(config.SMTP_SERVER, config.SMTP_PORT) as server:
-            server.starttls()
-            server.login(config.SMTP_USER, config.SMTP_PASSWORD)
-            server.sendmail(config.FROM_EMAIL, email_destino, msg.as_string())
+        # url = f"{config.BASE_URL}/leer-mensaje/{file_name}"
+        url = f"{config.BASE_URL}/leer-mensaje/{unique_id}"
 
         return templates.TemplateResponse(plantillas.INDEX, {
             "request": request,
-            "success_message": "Mensaje enviado y almacenado correctamente. Revisa tu correo electrónico para leerlo."
+            "share_url": url,
+            "success_message": f"Mensaje almacenado correctamente. Aquí tienes la URL para compartir: {url}"
         })
 
     except Exception as e:
         return templates.TemplateResponse(plantillas.INDEX, {
             "request": request,
-            "error_message": f"Hubo un error al guardar o enviar el mensaje: {str(e)}"
+            "error_message": f"Hubo un error al guardar el mensaje: {str(e)}"
         })
 
 # Endpoint para leer el mensaje
 @router.get("/leer-mensaje/{file_name}", response_class=HTMLResponse)
 async def leer_mensaje(file_name: str, request: Request):
+    # Aseguramos que el nombre del archivo tenga la extensión .json
+    file_name = f"{file_name}.json"  
     try:
         with open(file_name, "r") as f:
             data = json.load(f)
             mensaje_encriptado = data["mensaje"].encode()
             mensaje = desencriptar(mensaje_encriptado, config.SECRET_KEY)
-            texto = "Un texto cualquiera"
-
+         
         os.remove(file_name)
 
         return templates.TemplateResponse(
             plantillas.MENSAJE,
-            {"request": request, "mensaje": mensaje, "texto": texto}
+            {"request": request, "mensaje": mensaje}
         )
     except FileNotFoundError:
         return templates.TemplateResponse(

@@ -1,31 +1,27 @@
 {% include "includes/header.html" %}
-    <div class="form-container">
-        <h1 class="text-center mb-4">Enviar un Mensaje</h1>
+<div class="form-container">
+    <h1 class="text-center mb-4">Enviar un Mensaje</h1>
 
-        <!-- Mostrar alertas si existen -->
-        {% if success_message %}
-        <div class="alert alert-success" role="alert">
-            {{ success_message }}
-        </div>
-        {% endif %}
-
-        {% if error_message %}
-        <div class="alert alert-danger" role="alert">
-            {{ error_message }}
-        </div>
-        {% endif %}
-
-        <form action="/guardar/" method="post">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email destino:</label>
-               <input type="email" class="form-control" id="email" name="email">
-            </div>
-            <div class="mb-3">
-                <label for="mensaje" class="form-label">Mensaje</label>
-                <textarea class="form-control" id="mensaje" name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Enviar</button>
-        </form>
+    <!-- Mostrar alertas si existen -->
+    {% if success_message %}
+    <div class="alert alert-success" role="alert">
+        {{ success_message }}
     </div>
-    {% include "includes/footer.html" %}
+    {% endif %}
 
+    {% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+    <form action="/guardar/" method="post">
+        <div class="mb-3">
+            <label for="mensaje" class="form-label">Mensaje</label>
+            <textarea class="form-control" id="mensaje" name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..."
+                required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Enviar</button>
+    </form>
+</div>
+{% include "includes/footer.html" %}
