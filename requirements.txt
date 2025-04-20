@@ -4,3 +4,4 @@ dotenv
 pydantic
 cryptography
 jinja2
+python-multipart
