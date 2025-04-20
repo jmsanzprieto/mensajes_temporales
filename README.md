@@ -117,4 +117,3 @@ Asegúrate de tener instalado Python 3.7+ y pip.
 * Implementar logging para el seguimiento y la depuración.
 * Considerar el uso de una base de datos en lugar de archivos para almacenar los mensajes temporalmente (con mecanismos de eliminación automática más robustos).
 
-¡Espero que esto te sea útil para tu archivo `README.md`! Si tienes alguna otra pregunta, no dudes en consultarme.
